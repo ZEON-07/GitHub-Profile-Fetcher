@@ -1,11 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 )
+
+type GitHubUser struct {
+	Name        string `json:"name"`
+	Bio         string `json:"bio"`
+	PublicRepos int    `json:"public_repos"`
+}
 
 func main() {
 	if len(os.Args) < 2 {
@@ -34,6 +41,13 @@ func main() {
 		return
 	}
 
-	// Lazily dump raw, unformatted JSON directly into the terminal
-	fmt.Println(string(body))
+	var user GitHubUser
+	if err := json.Unmarshal(body, &user); err != nil {
+		fmt.Println("Error parsing response:", err)
+		return
+	}
+
+	fmt.Println("Name:", user.Name)
+	fmt.Println("Bio:", user.Bio)
+	fmt.Println("Public Repos:", user.PublicRepos)
 }
